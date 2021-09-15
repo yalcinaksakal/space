@@ -1,15 +1,21 @@
 import { useEffect, useRef } from "react";
+import { useDispatch } from "react-redux";
 
-import Spinner from "../Spinner/SpinnerDots";
 import setScene from "../../lib/setScene";
+import { loadingActions } from "../../store/loading-slice";
 
 const Canvas = () => {
   const canvasRef = useRef();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const appender = () => canvasRef.current.appendChild(domElement);
 
-    const { domElement, onResize, animate } = setScene(appender);
+    const { domElement, onResize, animate } = setScene(
+      appender,
+      dispatch,
+      loadingActions
+    );
 
     let frameId;
 
@@ -30,7 +36,7 @@ const Canvas = () => {
       window.removeEventListener("resize", onResize);
       domElement.remove();
     };
-  }, []);
+  }, [dispatch]);
 
   return (
     <div

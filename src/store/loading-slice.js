@@ -2,7 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   isLoading: true,
-  loadingMsg: "textures model",
+  loadingMsgs: [],
+  completeds: 0,
 };
 
 const loadingSlice = createSlice({
@@ -13,7 +14,10 @@ const loadingSlice = createSlice({
       state.isLoading = action.payload;
     },
     setMsg(state, action) {
-      state.loadingMsg = action.payload;
+      const msg = action.payload;
+      if (msg.split(" ").pop() === "done") state.completeds++;
+      state.loadingMsgs.push(msg);
+      if (state.completeds > 1) state.loadingMsgs.push("Loaded successfully");
     },
   },
 });
