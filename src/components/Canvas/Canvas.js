@@ -10,11 +10,8 @@ const Canvas = () => {
 
   useEffect(() => {
     const appender = () => canvasRef.current.appendChild(domElement);
-    const { domElement, onResize, animate } = setScene(
-      appender,
-      dispatch,
-      loadingActions
-    );
+    const { domElement, onResize, animate, keyDownHandler,keyUpHandler } =
+      setScene(appender, dispatch, loadingActions);
 
     let frameId;
 
@@ -25,9 +22,8 @@ const Canvas = () => {
 
     //resize
     window.addEventListener("resize", onResize);
-    window.addEventListener("keydown", e => {
-      console.log(e);
-    });
+    window.addEventListener("keydown", keyDownHandler);
+    window.addEventListener("keyup", keyUpHandler);
     //start animation
     RAF();
 
@@ -35,6 +31,8 @@ const Canvas = () => {
     return () => {
       cancelAnimationFrame(frameId);
       window.removeEventListener("resize", onResize);
+      window.removeEventListener("keydown", keyDownHandler);
+      window.removeEventListener("keyup", keyUpHandler);
       domElement.remove();
     };
   }, [dispatch]);

@@ -10,8 +10,16 @@ import createR from "./renderer";
 import setOrbitControls from "./setOrbitControls";
 import soundLoader from "./soundLoader";
 
+const movementMap = {
+  ArrowUp: { isMoving: true, axis: "y", speed: 10 },
+  ArrowRight: { isMoving: true, axis: "x", speed: -10 },
+  ArrowLeft: { isMoving: true, axis: "x", speed: 10 },
+  ArrowDown: { isMoving: true, axis: "y", speed: -10 },
+};
 const setScene = (appenderFunc, dispatch, actions) => {
   const loadedContent = [];
+  const models = [];
+  let movement = { isMoving: false, axis: "", speed: 0 };
   //renderer
   const renderer = createR();
   //camera
@@ -23,8 +31,16 @@ const setScene = (appenderFunc, dispatch, actions) => {
   scene.add(lights.directional);
   scene.add(lights.ambient);
 
+  const move = () => {
+    models[0].scene.position[movement.axis] += movement.speed;
+    if (!movement.isMoving && Math.abs(movement.speed) > 0)
+      movement.speed += movement.speed > 0 ? -0.3 : 0.3;
+  };
+
   //animate
   const animate = () => {
+    if (Math.abs(movement.speed) > 1) move();
+    camera.position.z -= 2;
     renderer.render(scene, camera);
     controls.update();
   };
@@ -32,6 +48,7 @@ const setScene = (appenderFunc, dispatch, actions) => {
   const { domElement } = renderer;
 
   //background, texture onLoad calls appender
+
   dispatch(actions.setMsg("Loading textures"));
   scene.background = cubeTexture(
     appenderFunc,
@@ -47,7 +64,15 @@ const setScene = (appenderFunc, dispatch, actions) => {
     //GLTF model
     dispatch(actions.setMsg("Loading model"));
     camera.add(listener);
-    modelLoader(scene, appenderFunc, loadedContent, dispatch, actions, sound);
+    modelLoader(
+      scene,
+      appenderFunc,
+      loadedContent,
+      dispatch,
+      actions,
+      sound,
+      models
+    );
 
     if (loadedContent.length > NUMBER_OF_CONTENTS_TO_LOAD - 1) appenderFunc();
   };
@@ -65,6 +90,14 @@ const setScene = (appenderFunc, dispatch, actions) => {
     renderer.setSize(window.innerWidth, window.innerHeight);
   };
 
+  const keyDownHandler = ({ code }) => {
+    if (!models[0] || !movementMap[code]) return;
+    console.log(scene.background);
+    movement = { ...movementMap[code] };
+  };
+  const keyUpHandler = ({ code }) => {
+    movement.isMoving = false;
+  };
   return {
     animate,
     scene,
@@ -73,6 +106,8 @@ const setScene = (appenderFunc, dispatch, actions) => {
     controls,
     onResize,
     engineSound,
+    keyDownHandler,
+    keyUpHandler,
   };
 };
 

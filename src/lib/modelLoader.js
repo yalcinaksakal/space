@@ -2,7 +2,15 @@ import { Color } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { NUMBER_OF_CONTENTS_TO_LOAD } from "../config/content";
 
-const modelLoader = (scene, onLoadFunc, loadeds, dispatch, actions, sound) => {
+const modelLoader = (
+  scene,
+  onLoadFunc,
+  loadeds,
+  dispatch,
+  actions,
+  sound,
+  models
+) => {
   const loader = new GLTFLoader();
   loader.load("ship/scene.gltf", gltf => {
     gltf.scene.traverse(c => {
@@ -11,12 +19,12 @@ const modelLoader = (scene, onLoadFunc, loadeds, dispatch, actions, sound) => {
         c.receiveShadow = true;
       }
       if (c.name === "mesh_0") {
-        c.material.color = new Color(2, 2, 3);
+        c.material.color = new Color(1, 3, 1);
         c.material.emissive = new Color(15, 55, 155);
         sound.play();
       }
       if (c.name === "mesh_1") {
-        c.material.color = new Color(3, 3, 3);
+        c.material.color = new Color(255, 255, 255);
       }
     });
     gltf.scene.scale.set(0.1, 0.1, 0.1);
@@ -24,6 +32,7 @@ const modelLoader = (scene, onLoadFunc, loadeds, dispatch, actions, sound) => {
     loadeds.push("model");
     dispatch(actions.setMsg("Model done"));
     if (loadeds.length > NUMBER_OF_CONTENTS_TO_LOAD - 1) onLoadFunc();
+    models.push(gltf);
   });
 };
 export default modelLoader;
