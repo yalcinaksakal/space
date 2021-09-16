@@ -8,7 +8,7 @@ const Loading = () => {
   const { loadingMsgs } = useSelector(state => state.loading);
   const isDone = loadingMsgs[loadingMsgs.length - 1] === "Loaded successfully";
   isDone &&
-    setTimeout(() => dispatch(loadingActions.setIsLoading(false)), 2000);
+    setTimeout(() => dispatch(loadingActions.setIsLoading(false)), 1000);
 
   return (
     <div className={styles.loading}>

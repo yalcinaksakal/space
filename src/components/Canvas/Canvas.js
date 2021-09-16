@@ -10,7 +10,6 @@ const Canvas = () => {
 
   useEffect(() => {
     const appender = () => canvasRef.current.appendChild(domElement);
-
     const { domElement, onResize, animate } = setScene(
       appender,
       dispatch,
@@ -26,7 +25,9 @@ const Canvas = () => {
 
     //resize
     window.addEventListener("resize", onResize);
-
+    window.addEventListener("keydown", e => {
+      console.log(e);
+    });
     //start animation
     RAF();
 

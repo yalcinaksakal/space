@@ -6,6 +6,7 @@ const Paragraph = () => (
       left: "5px",
       color: "whitesmoke",
       fontSize: "10px",
+      userSelect: "none",
     }}
   >
     Left click (touch) rotates.

@@ -1,4 +1,5 @@
 import { CubeTextureLoader } from "three";
+import { NUMBER_OF_CONTENTS_TO_LOAD } from "../config/content";
 
 const cubeTexture = (onLoad, loadeds, dispatch, actions) => {
   const loader = new CubeTextureLoader().load(
@@ -15,7 +16,7 @@ const cubeTexture = (onLoad, loadeds, dispatch, actions) => {
     () => {
       loadeds.push("textures");
       dispatch(actions.setMsg("Textures done"));
-      if (loadeds.length > 1) onLoad();
+      if (loadeds.length > NUMBER_OF_CONTENTS_TO_LOAD - 1) onLoad();
     }
   );
 

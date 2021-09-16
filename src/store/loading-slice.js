@@ -1,9 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { NUMBER_OF_CONTENTS_TO_LOAD } from "../config/content";
 
 const initialState = {
   isLoading: true,
   loadingMsgs: [],
   completeds: 0,
+  gltf: null,
 };
 
 const loadingSlice = createSlice({
@@ -17,7 +19,11 @@ const loadingSlice = createSlice({
       const msg = action.payload;
       if (msg.split(" ").pop() === "done") state.completeds++;
       state.loadingMsgs.push(msg);
-      if (state.completeds > 1) state.loadingMsgs.push("Loaded successfully");
+      if (state.completeds > NUMBER_OF_CONTENTS_TO_LOAD - 1)
+        state.loadingMsgs.push("Loaded successfully");
+    },
+    setGLTF(state, action) {
+      state.gltf = action.payload;
     },
   },
 });

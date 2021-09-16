@@ -1,4 +1,6 @@
 import { Scene } from "three";
+import { NUMBER_OF_CONTENTS_TO_LOAD } from "../config/content";
+
 import myCam from "./camera";
 
 import cubeTexture from "./cubeTexture";
@@ -6,6 +8,7 @@ import createLights from "./lights";
 import modelLoader from "./modelLoader";
 import createR from "./renderer";
 import setOrbitControls from "./setOrbitControls";
+import soundLoader from "./soundLoader";
 
 const setScene = (appenderFunc, dispatch, actions) => {
   const loadedContent = [];
@@ -29,7 +32,6 @@ const setScene = (appenderFunc, dispatch, actions) => {
   const { domElement } = renderer;
 
   //background, texture onLoad calls appender
-  // setLoadingMsg("Loading Textures");
   dispatch(actions.setMsg("Loading textures"));
   scene.background = cubeTexture(
     appenderFunc,
@@ -38,9 +40,20 @@ const setScene = (appenderFunc, dispatch, actions) => {
     actions
   );
 
-  //GLTF model
-  dispatch(actions.setMsg("Loading model"));
-  modelLoader(scene, appenderFunc, loadedContent, dispatch, actions);
+  //sounds
+  const onSound = (listener, sound) => {
+    dispatch(actions.setMsg("Sounds done"));
+    loadedContent.push("sounds");
+    //GLTF model
+    dispatch(actions.setMsg("Loading model"));
+    camera.add(listener);
+    modelLoader(scene, appenderFunc, loadedContent, dispatch, actions, sound);
+
+    if (loadedContent.length > NUMBER_OF_CONTENTS_TO_LOAD - 1) appenderFunc();
+  };
+
+  dispatch(actions.setMsg("Loading sounds"));
+  const engineSound = soundLoader(onSound);
 
   //add controls
   const controls = setOrbitControls(camera, domElement);
@@ -52,7 +65,15 @@ const setScene = (appenderFunc, dispatch, actions) => {
     renderer.setSize(window.innerWidth, window.innerHeight);
   };
 
-  return { animate, scene, camera, domElement, controls, onResize };
+  return {
+    animate,
+    scene,
+    camera,
+    domElement,
+    controls,
+    onResize,
+    engineSound,
+  };
 };
 
 export default setScene;

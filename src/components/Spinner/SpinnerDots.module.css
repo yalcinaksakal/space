@@ -11,7 +11,7 @@
   height: 15px;
   margin: 20px 5px;
   border-radius: 100%;
-  background: yellow;
+  background: rgb(255, 0, 0);
   display: inline-block;
   animation: bouncedelay 1.3s infinite ease-in-out;
   animation-fill-mode: both;
