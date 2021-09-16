@@ -28,6 +28,7 @@ const modelLoader = (
       }
     });
     gltf.scene.scale.set(0.1, 0.1, 0.1);
+
     scene.add(gltf.scene);
     loadeds.push("model");
     dispatch(actions.setMsg("Model done"));

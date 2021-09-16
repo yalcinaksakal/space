@@ -1,25 +1,61 @@
 import { Scene } from "three";
-import { NUMBER_OF_CONTENTS_TO_LOAD } from "../config/content";
+import { DEGREE, NUMBER_OF_CONTENTS_TO_LOAD } from "../config/content";
 
 import myCam from "./camera";
 
 import cubeTexture from "./cubeTexture";
 import createLights from "./lights";
 import modelLoader from "./modelLoader";
+
 import createR from "./renderer";
 import setOrbitControls from "./setOrbitControls";
 import soundLoader from "./soundLoader";
 
 const movementMap = {
-  ArrowUp: { isMoving: true, axis: "y", speed: 10 },
-  ArrowRight: { isMoving: true, axis: "x", speed: -10 },
-  ArrowLeft: { isMoving: true, axis: "x", speed: 10 },
-  ArrowDown: { isMoving: true, axis: "y", speed: -10 },
+  ArrowUp: {
+    code: "ArrowUp",
+    isMoving: true,
+    axis: "y",
+    speed: 10,
+    rotationAxis: "x",
+    rotDirection: -1,
+  },
+  ArrowDown: {
+    code: "ArrowDown",
+    isMoving: true,
+    axis: "y",
+    speed: -10,
+    rotationAxis: "x",
+    rotDirection: 1,
+  },
+  ArrowRight: {
+    code: "ArrowRight",
+    isMoving: true,
+    axis: "x",
+    speed: -10,
+    rotationAxis: "z",
+    rotDirection: 1,
+  },
+  ArrowLeft: {
+    code: "ArrowLeft",
+    isMoving: true,
+    axis: "x",
+    speed: 10,
+    rotationAxis: "z",
+    rotDirection: -1,
+  },
 };
 const setScene = (appenderFunc, dispatch, actions) => {
   const loadedContent = [];
   const models = [];
-  let movement = { isMoving: false, axis: "", speed: 0 };
+  let movement = {
+    code: "",
+    isMoving: false,
+    axis: "",
+    speed: 0,
+    rotDirection: 0,
+    rotationAxis: "",
+  };
   //renderer
   const renderer = createR();
   //camera
@@ -30,17 +66,33 @@ const setScene = (appenderFunc, dispatch, actions) => {
   const lights = createLights();
   scene.add(lights.directional);
   scene.add(lights.ambient);
-
+  let val;
+  let angle;
   const move = () => {
-    models[0].scene.position[movement.axis] += movement.speed;
-    if (!movement.isMoving && Math.abs(movement.speed) > 0)
+    val = models[0].scene.position[movement.axis] + movement.speed;
+    if (val > -1000 && val < 1000)
+      models[0].scene.position[movement.axis] += movement.speed;
+    if (!movement.isMoving && Math.abs(movement.speed) > 0) {
       movement.speed += movement.speed > 0 ? -0.3 : 0.3;
+      angle = models[0].scene.rotation[movement.rotationAxis];
+      if (Math.abs(angle) < 2 * DEGREE)
+        models[0].scene.rotation[movement.rotationAxis] = 0;
+      else
+        models[0].scene.rotation[movement.rotationAxis] +=
+          DEGREE * movement.rotDirection * -1 * 3;
+    }
   };
 
   //animate
+
   const animate = () => {
-    if (Math.abs(movement.speed) > 1) move();
-    camera.position.z -= 2;
+    if (Math.abs(movement.speed) > 1) {
+      move();
+      angle = models[0].scene.rotation[movement.rotationAxis];
+      if (Math.abs(angle) < 50 * DEGREE)
+        models[0].scene.rotation[movement.rotationAxis] +=
+          DEGREE * movement.rotDirection;
+    }
     renderer.render(scene, camera);
     controls.update();
   };
@@ -91,8 +143,14 @@ const setScene = (appenderFunc, dispatch, actions) => {
   };
 
   const keyDownHandler = ({ code }) => {
+    console.log(code);
+    if (code === "KeyR") {
+      controls.reset();
+      if (models[0]) models[0].scene.position.set(0, 0, 0);
+      return;
+    }
     if (!models[0] || !movementMap[code]) return;
-    console.log(scene.background);
+    if (movement.code !== code) models[0].scene.rotation.set(0, 0, 0);
     movement = { ...movementMap[code] };
   };
   const keyUpHandler = ({ code }) => {

@@ -6,7 +6,7 @@ const setOrbitControls = (cam, el) => {
   // controls.autoRotate = true;
   // controls.autoRotateSpeed = 0.2;
   controls.enableDamping = true;
-  controls.maxDistance = 1000;
+  controls.maxDistance = 5000;
   controls.minDistance = 2;
 
   return controls;
