@@ -1,4 +1,4 @@
-import { Scene } from "three";
+import { Scene, Vector3 } from "three";
 import { DEGREE, NUMBER_OF_CONTENTS_TO_LOAD } from "../config/content";
 
 import myCam from "./camera";
@@ -10,6 +10,7 @@ import modelLoader from "./modelLoader";
 import createR from "./renderer";
 import setOrbitControls from "./setOrbitControls";
 import soundLoader from "./soundLoader";
+import setStars, { animateStars } from "./stars";
 
 const movementMap = {
   ArrowUp: {
@@ -66,13 +67,18 @@ const setScene = (appenderFunc, dispatch, actions) => {
   const lights = createLights();
   scene.add(lights.directional);
   scene.add(lights.ambient);
-  let val;
-  let angle;
+
+  //Add stars
+  const stars = setStars(scene);
+
+  //move
+  let val, angle;
   const move = () => {
     val = models[0].scene.position[movement.axis] + movement.speed;
-    if (val > -1000 && val < 1000)
+    if (Math.abs(val) < (movement.axis === "x" ? 1000 : 600)) {
       models[0].scene.position[movement.axis] += movement.speed;
-    if (!movement.isMoving && Math.abs(movement.speed) > 0) {
+    }
+    if (!movement.isMoving) {
       movement.speed += movement.speed > 0 ? -0.3 : 0.3;
       angle = models[0].scene.rotation[movement.rotationAxis];
       if (Math.abs(angle) < 2 * DEGREE)
@@ -93,6 +99,7 @@ const setScene = (appenderFunc, dispatch, actions) => {
         models[0].scene.rotation[movement.rotationAxis] +=
           DEGREE * movement.rotDirection;
     }
+    animateStars(stars);
     renderer.render(scene, camera);
     controls.update();
   };
@@ -143,17 +150,36 @@ const setScene = (appenderFunc, dispatch, actions) => {
   };
 
   const keyDownHandler = ({ code }) => {
-    console.log(code);
     if (code === "KeyR") {
       controls.reset();
       if (models[0]) models[0].scene.position.set(0, 0, 0);
       return;
     }
-    if (!models[0] || !movementMap[code]) return;
+    if (!models[0]) return;
+
+    //look directions.
+    switch (code) {
+      case "KeyW":
+        controls.rotate(90 * DEGREE, false);
+        break;
+      case "KeyS":
+        controls.rotate(-90 * DEGREE, false);
+        break;
+      case "KeyA":
+        controls.rotate(90 * DEGREE, true);
+        break;
+      case "KeyD":
+        controls.rotate(-90 * DEGREE, true);
+        break;
+      default:
+        break;
+    }
+    if (!movementMap[code]) return;
     if (movement.code !== code) models[0].scene.rotation.set(0, 0, 0);
     movement = { ...movementMap[code] };
   };
   const keyUpHandler = ({ code }) => {
+    //if code =movemonet code
     movement.isMoving = false;
   };
   return {

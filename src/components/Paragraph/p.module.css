@@ -7,9 +7,10 @@
   user-select: none;
   opacity: 0.6;
   z-index: 100;
-  transition: opacity 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .p:hover {
   opacity: 1;
+  transform: scale(2) translate(60px, -20px);
 }

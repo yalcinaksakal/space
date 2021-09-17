@@ -19,16 +19,15 @@ const modelLoader = (
         c.receiveShadow = true;
       }
       if (c.name === "mesh_0") {
-        c.material.color = new Color(1, 3, 1);
+        c.material.color = new Color(3, 3, 3);
         c.material.emissive = new Color(15, 55, 155);
         sound.play();
       }
       if (c.name === "mesh_1") {
-        c.material.color = new Color(255, 255, 255);
+        // c.material.color = new Color(255, 255, 255);
       }
     });
     gltf.scene.scale.set(0.1, 0.1, 0.1);
-
     scene.add(gltf.scene);
     loadeds.push("model");
     dispatch(actions.setMsg("Model done"));
