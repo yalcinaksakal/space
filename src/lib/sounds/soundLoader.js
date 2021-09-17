@@ -1,10 +1,10 @@
 import { AudioLoader } from "three";
 
-const soundLoader = loaded => {
+const soundLoader = onLoad => {
   // load a sound and set it as the PositionalAudio object's buffer
   const audioLoader = new AudioLoader();
   audioLoader.load("sounds/engine.mp3", buffer => {
-    loaded(buffer);
+    onLoad(buffer);
   });
 };
 
