@@ -17,7 +17,7 @@ function setStars(scene) {
     const sphere = new Mesh(geometry, material);
     sphere.position.x = Math.random() * 4000 - 2000;
     sphere.position.y = Math.random() * 4000 - 2000;
-    sphere.position.z = z;
+    sphere.position.z = z + 1800;
     scene.add(sphere);
     stars.push(sphere);
   }
@@ -29,7 +29,7 @@ export function animateStars(stars) {
   let star;
   for (let i = 0; i < stars.length; i++) {
     star = stars[i];
-    star.position.z -= i / 100;
+    star.position.z -= i / 50;
     if (star.position.z < -2000) star.position.z += 6000;
   }
 }

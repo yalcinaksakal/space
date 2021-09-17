@@ -32,8 +32,7 @@ const setScene = (appenderFunc, dispatch, actions) => {
   const scene = new Scene();
   //lights
   const lights = createLights();
-  scene.add(lights.directional);
-  scene.add(lights.ambient);
+  Object.values(lights).forEach(light => scene.add(light));
 
   //Add stars
   const stars = setStars(scene);

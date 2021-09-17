@@ -27,7 +27,7 @@ const modelLoader = (
     scale = 0.1,
     position = { x: 0, y: 0, z: 0 },
     rotation = { rx: 0, ry: 0, rz: 0 },
-    color = new Color(1, 1, 1),
+    color = new Color(3, 3, 1),
     audioDistanceRef = 200
   ) => {
     const model = gltf.scene;
@@ -62,13 +62,12 @@ const modelLoader = (
   const loader = new GLTFLoader();
   //deep clone costs much than reload
   // addmodel(model,type,scale,position,rotation,color,audioDistanceRef)
-
   loader.load("ship/scene.gltf", gltf =>
     addModel(
       gltf,
       "others",
       0.3,
-      { x: 0, y: -100, z: 7000 },
+      { x: 0, y: -100, z: 7500 },
       { rx: 0, ry: 180, rz: 0 }
     )
   );

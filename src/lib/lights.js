@@ -1,4 +1,4 @@
-import { DirectionalLight, AmbientLight } from "three";
+import { DirectionalLight, AmbientLight, PointLight } from "three";
 
 const createLights = () => {
   //lights
@@ -15,7 +15,18 @@ const createLights = () => {
   light.shadow.camera.right = -200;
   light.shadow.camera.top = 200;
   light.shadow.camera.bottom = -200;
-  return { directional: light, ambient: new AmbientLight(0x404040) };
+
+  const plight = new PointLight("white", 1, 100);
+  plight.position.set(500, 100, 0);
+  const plight2 = new PointLight("red", 1, 100);
+  plight.position.set(-500, -100, 0);
+
+  return {
+    directional: light,
+    ambient: new AmbientLight(0x404040),
+    point: plight,
+    p2: plight2,
+  };
 };
 
 export default createLights;
