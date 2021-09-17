@@ -1,4 +1,4 @@
-import { Scene, Vector3 } from "three";
+import { Scene, AudioListener } from "three";
 import { DEGREE, NUMBER_OF_CONTENTS_TO_LOAD } from "../config/content";
 
 import myCam from "./camera";
@@ -48,7 +48,7 @@ const movementMap = {
 };
 const setScene = (appenderFunc, dispatch, actions) => {
   const loadedContent = [];
-  const models = [];
+  const models = { main: null, others: [] };
   let movement = {
     code: "",
     isMoving: false,
@@ -74,17 +74,17 @@ const setScene = (appenderFunc, dispatch, actions) => {
   //move
   let val, angle;
   const move = () => {
-    val = models[0].scene.position[movement.axis] + movement.speed;
+    val = models.main.position[movement.axis] + movement.speed;
     if (Math.abs(val) < (movement.axis === "x" ? 1000 : 600)) {
-      models[0].scene.position[movement.axis] += movement.speed;
+      models.main.position[movement.axis] += movement.speed;
     }
     if (!movement.isMoving) {
       movement.speed += movement.speed > 0 ? -0.3 : 0.3;
-      angle = models[0].scene.rotation[movement.rotationAxis];
+      angle = models.main.rotation[movement.rotationAxis];
       if (Math.abs(angle) < 2 * DEGREE)
-        models[0].scene.rotation[movement.rotationAxis] = 0;
+        models.main.rotation[movement.rotationAxis] = 0;
       else
-        models[0].scene.rotation[movement.rotationAxis] +=
+        models.main.rotation[movement.rotationAxis] +=
           DEGREE * movement.rotDirection * -1 * 3;
     }
   };
@@ -94,10 +94,15 @@ const setScene = (appenderFunc, dispatch, actions) => {
   const animate = () => {
     if (Math.abs(movement.speed) > 1) {
       move();
-      angle = models[0].scene.rotation[movement.rotationAxis];
+      angle = models.main.rotation[movement.rotationAxis];
       if (Math.abs(angle) < 50 * DEGREE)
-        models[0].scene.rotation[movement.rotationAxis] +=
+        models.main.rotation[movement.rotationAxis] +=
           DEGREE * movement.rotDirection;
+    }
+    if (models.others[0]) {
+      models.others[0].position.z += -20;
+      if (models.others[0].position.z < -7000)
+        models.others[0].position.z = 7000;
     }
     animateStars(stars);
     renderer.render(scene, camera);
@@ -117,7 +122,10 @@ const setScene = (appenderFunc, dispatch, actions) => {
   );
 
   //sounds
-  const onSound = (listener, sound) => {
+  const listener = new AudioListener();
+  camera.add(listener);
+
+  const onSound = soundBuf => {
     dispatch(actions.setMsg("Sounds done"));
     loadedContent.push("sounds");
     //GLTF model
@@ -129,15 +137,16 @@ const setScene = (appenderFunc, dispatch, actions) => {
       loadedContent,
       dispatch,
       actions,
-      sound,
-      models
+      models,
+      listener,
+      soundBuf
     );
 
     if (loadedContent.length > NUMBER_OF_CONTENTS_TO_LOAD - 1) appenderFunc();
   };
 
   dispatch(actions.setMsg("Loading sounds"));
-  const engineSound = soundLoader(onSound);
+  soundLoader(onSound);
 
   //add controls
   const controls = setOrbitControls(camera, domElement);
@@ -152,11 +161,10 @@ const setScene = (appenderFunc, dispatch, actions) => {
   const keyDownHandler = ({ code }) => {
     if (code === "KeyR") {
       controls.reset();
-      if (models[0]) models[0].scene.position.set(0, 0, 0);
+      if (models.main) models.main.position.set(0, 0, 0);
       return;
     }
-    if (!models[0]) return;
-
+    if (!models.main) return;
     //look directions.
     switch (code) {
       case "KeyW":
@@ -175,7 +183,7 @@ const setScene = (appenderFunc, dispatch, actions) => {
         break;
     }
     if (!movementMap[code]) return;
-    if (movement.code !== code) models[0].scene.rotation.set(0, 0, 0);
+    if (movement.code !== code) models.main.rotation.set(0, 0, 0);
     movement = { ...movementMap[code] };
   };
   const keyUpHandler = ({ code }) => {
@@ -189,7 +197,7 @@ const setScene = (appenderFunc, dispatch, actions) => {
     domElement,
     controls,
     onResize,
-    engineSound,
+
     keyDownHandler,
     keyUpHandler,
   };
