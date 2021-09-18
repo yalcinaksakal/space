@@ -28,7 +28,7 @@ const modelLoader = (
     position = { x: 0, y: 0, z: 0 },
     rotation = { rx: 0, ry: 0, rz: 0 },
     color = new Color(3, 3, 1),
-    audioDistanceRef = 500
+    audioDistanceRef = 300
   ) => {
     const model = gltf.scene;
     model.traverse(c => {
@@ -80,7 +80,7 @@ const modelLoader = (
       { x: 0, y: 0, z: 0 },
       { rx: 0, ry: 0, rz: 0 },
       new Color(1, 1, 3),
-      200
+      20
     );
     dispatch(actions.setMsg("Model done"));
     if (loadeds.length > NUMBER_OF_CONTENTS_TO_LOAD - 1) onLoadFunc();

@@ -8,13 +8,13 @@ const moveShip = (model, movement) => {
       model.position[movement.axis] += movement.speed;
     }
     if (!movement.isMoving) {
-      movement.speed += movement.speed > 0 ? -0.3 : 0.3;
+      movement.speed += movement.speed > 0 ? -1 : 1;
       angle = model.rotation[movement.rotationAxis];
-      if (Math.abs(angle) < 2 * DEGREE)
+      if (Math.abs(angle) < 4 * DEGREE)
         model.rotation[movement.rotationAxis] = 0;
       else
         model.rotation[movement.rotationAxis] +=
-          DEGREE * movement.rotDirection * -1 * 3;
+          DEGREE * movement.rotDirection * -1 * 6;
     }
   };
   if (Math.abs(movement.speed) > 1) {
